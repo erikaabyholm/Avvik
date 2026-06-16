@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hjemmets Avvikssystem v1.0</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+
+  :root {
+    --red: #CC2200;
+    --red-light: #FF3B1A;
+    --red-pale: #FFF0EE;
+    --yellow: #FFB800;
+    --yellow-pale: #FFFAED;
+    --green: #00843D;
+    --green-pale: #EDFAF3;
+    --ink: #1A1A1A;
+    --ink-mid: #555;
+    --ink-light: #999;
+    --border: #D8D8D8;
+    --bg: #F5F5F3;
+    --white: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* TOP BANNER */
+  .top-banner {
+    background: var(--red);
+    color: white;
+    text-align: center;
+    padding: 6px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--white);
+    border-bottom: 3px solid var(--ink);
+    padding: 20px 24px 0;
+  }
+
+  .header-inner {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding-bottom: 16px;
+  }
+
+  .iso-badge {
+    background: var(--red);
+    color: white;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    padding: 6px 8px;
+    line-height: 1.4;
+    text-align: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .header-title h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .header-title .subtitle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-light);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  /* NAV TABS */
+  nav {
+    display: flex;
+    gap: 0;
+    margin-top: 16px;
+  }
+
+  .tab {
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--ink-mid);
+    border-top: 3px solid transparent;
+    letter-spacing: 0.02em;
+    transition: all 0.15s;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  .tab:hover { color: var(--red); }
+
+  .tab.active {
+    color: var(--red);
+    border-top-color: var(--red);
+    background: var(--bg);
+  }
+
+  /* MAIN */
+  main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 28px 24px;
+  }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 16px;
+  }
+
+  /* FORM CARD */
+  .card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+  }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-mid);
+    margin-bottom: 8px;
+  }
+
+  /* WHO SELECTOR */
+  .who-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .who-btn {
+    padding: 14px 10px;
+    border: 2px solid var(--border);
+    background: var(--white);
+    cursor: pointer;
+    text-align: center;
+    font-family: 'IBM Plex Sans', sans-serif;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .who-btn .who-emoji { font-size: 24px; display: block; margin-bottom: 4px; }
+  .who-btn .who-name { font-size: 13px; font-weight: 600; }
+  .who-btn .who-role { font-size: 11px; color: var(--ink-light); }
+
+  .who-btn.selected {
+    border-color: var(--red);
+    background: var(--red-pale);
+  }
+
+  .who-btn.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    color: var(--red);
+    font-weight: 700;
+    font-size: 12px;
+  }
+
+  /* SEVERITY */
+  .severity-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .sev-btn {
+    padding: 12px 8px;
+    border: 2px solid var(--border);
+    background: var(--white);
+    cursor: pointer;
+    text-align: center;
+    font-family: 'IBM Plex Sans', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .sev-btn .sev-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .sev-btn .sev-label { font-size: 11px; }
+
+  .sev-btn[data-sev="1"] .sev-num { color: var(--green); }
+  .sev-btn[data-sev="2"] .sev-num { color: var(--yellow); }
+  .sev-btn[data-sev="3"] .sev-num { color: var(--red); }
+
+  .sev-btn[data-sev="1"].selected { border-color: var(--green); background: var(--green-pale); }
+  .sev-btn[data-sev="2"].selected { border-color: var(--yellow); background: var(--yellow-pale); }
+  .sev-btn[data-sev="3"].selected { border-color: var(--red); background: var(--red-pale); }
+
+  /* CATEGORY */
+  .cat-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .cat-btn {
+    padding: 7px 12px;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    cursor: pointer;
+    font-size: 12px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .cat-btn.selected {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  /* TEXTAREA */
+  textarea, input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--white);
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  textarea:focus, input[type="text"]:focus {
+    border-color: var(--red);
+  }
+
+  textarea { min-height: 80px; }
+
+  /* SUBMIT BTN */
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--red);
+    color: white;
+    border: none;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.15s;
+    margin-top: 4px;
+  }
+
+  .submit-btn:hover { background: var(--red-light); }
+
+  /* SUCCESS TOAST */
+  .toast {
+    display: none;
+    background: var(--green);
+    color: white;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    font-size: 13px;
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from { transform: translateY(-10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* STATS */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1;
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--ink-light);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* FILTERS */
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+
+  .filter-btn {
+    padding: 6px 12px;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'IBM Plex Sans', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .filter-btn.active {
+    background: var(--ink);
+    color: white;
+    border-color: var(--ink);
+  }
+
+  .filter-label {
+    font-size: 12px;
+    color: var(--ink-light);
+    font-weight: 600;
+  }
+
+  /* AVVIK LIST */
+  .avvik-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .avvik-item {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    padding: 16px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    transition: opacity 0.3s;
+  }
+
+  .avvik-item.behandlet {
+    opacity: 0.5;
+    border-style: dashed;
+  }
+
+  .sev-badge {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .sev-badge.s1 { background: var(--green-pale); color: var(--green); }
+  .sev-badge.s2 { background: var(--yellow-pale); color: var(--yellow); }
+  .sev-badge.s3 { background: var(--red-pale); color: var(--red); }
+
+  .avvik-content { flex: 1; min-width: 0; }
+
+  .avvik-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+
+  .avvik-who {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .avvik-who.mann { color: #2255CC; }
+  .avvik-who.kone { color: #CC22AA; }
+
+  .avvik-cat {
+    font-size: 10px;
+    background: var(--bg);
+    padding: 2px 6px;
+    color: var(--ink-mid);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .avvik-date {
+    font-size: 10px;
+    color: var(--ink-light);
+    font-family: 'IBM Plex Mono', monospace;
+    margin-left: auto;
+  }
+
+  .avvik-desc {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+
+  .avvik-actions { display: flex; gap: 8px; }
+
+  .action-btn {
+    padding: 5px 10px;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'IBM Plex Sans', sans-serif;
+    transition: all 0.15s;
+    letter-spacing: 0.03em;
+  }
+
+  .action-btn.ok-btn {
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .action-btn.ok-btn:hover {
+    background: var(--green);
+    color: white;
+  }
+
+  .action-btn.del-btn {
+    border-color: var(--border);
+    color: var(--ink-light);
+  }
+
+  .action-btn.del-btn:hover {
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  .avvik-item.behandlet .action-btn.ok-btn {
+    background: var(--green);
+    color: white;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--ink-light);
+  }
+
+  .empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+
+  /* PERSON STATS */
+  .person-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .person-stat-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    padding: 16px;
+  }
+
+  .person-stat-name {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .person-stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 6px;
+    color: var(--ink-mid);
+  }
+
+  .person-stat-row span:last-child {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* PROGRESS */
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    margin-top: 10px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--red);
+    transition: width 0.4s ease;
+  }
+
+  .progress-label {
+    font-size: 10px;
+    color: var(--ink-light);
+    margin-top: 4px;
+    text-align: right;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  @media (max-width: 500px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .stats-row .stat-card:last-child { grid-column: span 2; }
+    .person-stats { grid-template-columns: 1fr; }
+    .who-grid { grid-template-columns: 1fr 1fr; }
+    main { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-banner">🏠 HJEMME-KS — AVVIKSSYSTEM ISO 9001:HUSHOLD — KONFIDENSIELT</div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-row">
+      <div class="iso-badge">HMS<br>9001<br>🏠</div>
+      <div class="header-title">
+        <h1>Hjemmets Avvikssystem</h1>
+        <div class="subtitle">DOK-REV: 1.0 &nbsp;|&nbsp; KLASSIFISERING: HUSHOLDNING &nbsp;|&nbsp; TILGANG: BEGRENSET</div>
+      </div>
+    </div>
+    <nav>
+      <button class="tab active" data-page="registrer">📋 Registrer avvik</button>
+      <button class="tab" data-page="behandle">📊 Behandle &amp; statistikk</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- PAGE 1: REGISTRER -->
+  <div class="page active" id="page-registrer">
+    <div class="section-label">§ 4.2.1 — Innmelding av avvik</div>
+    <div id="toast" class="toast">✅ Avvik registrert og journalført!</div>
+
+    <div class="card">
+      <div class="card-title">📝 Nytt avvik</div>
+
+      <div class="form-group">
+        <label>Hvem melder inn?</label>
+        <div class="who-grid">
+          <button class="who-btn" data-who="Mann">
+            <span class="who-emoji">👨</span>
+            <span class="who-name">Mann</span>
+            <span class="who-role">Avdeling: Sofakroken</span>
+          </button>
+          <button class="who-btn" data-who="Kone">
+            <span class="who-emoji">👩</span>
+            <span class="who-name">Kone</span>
+            <span class="who-role">Avdeling: Alt annet</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Kategori</label>
+        <div class="cat-grid">
+          <button class="cat-btn" data-cat="🍽️ Oppvask">🍽️ Oppvask</button>
+          <button class="cat-btn" data-cat="🧹 Rydding">🧹 Rydding</button>
+          <button class="cat-btn" data-cat="🚽 Bad/WC">🚽 Bad/WC</button>
+          <button class="cat-btn" data-cat="🛒 Handel">🛒 Handel</button>
+          <button class="cat-btn" data-cat="📺 Sofa-tid">📺 Sofa-tid</button>
+          <button class="cat-btn" data-cat="🔇 Lyder">🔇 Lyder</button>
+          <button class="cat-btn" data-cat="😤 Generell">😤 Generell</button>
+          <button class="cat-btn" data-cat="🧦 Sokker">🧦 Sokker</button>
+          <button class="cat-btn" data-cat="💡 Lys">💡 Lys</button>
+          <button class="cat-btn" data-cat="🗑️ Søppel">🗑️ Søppel</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Alvorlighetsgrad</label>
+        <div class="severity-grid">
+          <button class="sev-btn" data-sev="1">
+            <span class="sev-num">1</span>
+            <span class="sev-label">Irriterende</span>
+          </button>
+          <button class="sev-btn" data-sev="2">
+            <span class="sev-num">2</span>
+            <span class="sev-label">Uakseptabelt</span>
+          </button>
+          <button class="sev-btn" data-sev="3">
+            <span class="sev-num">3</span>
+            <span class="sev-label">KRISE 🚨</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Beskrivelse av avviket</label>
+        <textarea id="desc-input" placeholder="Beskriv hva som ikke holder mål iht. husholdsstandarden..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Forventet korrektiv tiltak (valgfritt)</label>
+        <input type="text" id="tiltak-input" placeholder="F.eks: «Vaske kopper uten å bli spurt»">
+      </div>
+
+      <button class="submit-btn" id="submit-btn">📋 JOURNALFØR AVVIK</button>
+    </div>
+  </div>
+
+  <!-- PAGE 2: BEHANDLE -->
+  <div class="page" id="page-behandle">
+    <div class="section-label">§ 5.1 — Avviksbehandling og kvalitetsstatistikk</div>
+
+    <!-- STATS -->
+    <div class="stats-row" id="stats-row">
+      <div class="stat-card">
+        <span class="stat-num" id="stat-total">0</span>
+        <div class="stat-label">Totalt</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="stat-open" style="color:var(--red)">0</span>
+        <div class="stat-label">Åpne</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="stat-done" style="color:var(--green)">0</span>
+        <div class="stat-label">Behandlet</div>
+      </div>
+    </div>
+
+    <!-- PERSON STATS -->
+    <div class="person-stats" id="person-stats">
+      <div class="person-stat-card">
+        <div class="person-stat-name">👨 <span style="color:#2255CC">Mann</span></div>
+        <div class="person-stat-row"><span>Innmeldt</span><span id="mann-inn">0</span></div>
+        <div class="person-stat-row"><span>Mottatt</span><span id="mann-mot">0</span></div>
+        <div class="person-stat-row"><span>Krise-avvik (3)</span><span id="mann-krise">0</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="mann-bar" style="width:0%"></div></div>
+        <div class="progress-label" id="mann-pct">Ansvarsandel: 0%</div>
+      </div>
+      <div class="person-stat-card">
+        <div class="person-stat-name">👩 <span style="color:#CC22AA">Kone</span></div>
+        <div class="person-stat-row"><span>Innmeldt</span><span id="kone-inn">0</span></div>
+        <div class="person-stat-row"><span>Mottatt</span><span id="kone-mot">0</span></div>
+        <div class="person-stat-row"><span>Krise-avvik (3)</span><span id="kone-krise">0</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="kone-bar" style="width:0%;background:var(--red)"></div></div>
+        <div class="progress-label" id="kone-pct">Ansvarsandel: 0%</div>
+      </div>
+    </div>
+
+    <!-- FILTER -->
+    <div class="filter-row">
+      <span class="filter-label">Vis:</span>
+      <button class="filter-btn active" data-filter="alle">Alle</button>
+      <button class="filter-btn" data-filter="åpne">Åpne</button>
+      <button class="filter-btn" data-filter="behandlet">Behandlet</button>
+      <button class="filter-btn" data-filter="Mann">👨 Mann</button>
+      <button class="filter-btn" data-filter="Kone">👩 Kone</button>
+    </div>
+
+    <!-- LIST -->
+    <div class="avvik-list" id="avvik-list"></div>
+  </div>
+
+</main>
+
+<script>
+  // ---- STATE ----
+  const STORAGE_KEY = 'hjemme_avvik_v1';
+  let avvik = [];
+  let selectedWho = null;
+  let selectedSev = null;
+  let selectedCat = null;
+  let currentFilter = 'alle';
+
+  function load() {
+    try { avvik = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { avvik = []; }
+  }
+
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(avvik));
+  }
+
+  load();
+
+  // ---- TABS ----
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('page-' + tab.dataset.page).classList.add('active');
+      if (tab.dataset.page === 'behandle') renderBehandle();
+    });
+  });
+
+  // ---- WHO BUTTONS ----
+  document.querySelectorAll('.who-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.who-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedWho = btn.dataset.who;
+    });
+  });
+
+  // ---- SEVERITY ----
+  document.querySelectorAll('.sev-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sev-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedSev = parseInt(btn.dataset.sev);
+    });
+  });
+
+  // ---- CATEGORY ----
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedCat = btn.dataset.cat;
+    });
+  });
+
+  // ---- SUBMIT ----
+  document.getElementById('submit-btn').addEventListener('click', () => {
+    const desc = document.getElementById('desc-input').value.trim();
+    const tiltak = document.getElementById('tiltak-input').value.trim();
+
+    if (!selectedWho) return alert('Velg hvem som melder inn!');
+    if (!selectedSev) return alert('Velg alvorlighetsgrad!');
+    if (!selectedCat) return alert('Velg kategori!');
+    if (!desc) return alert('Beskriv avviket!');
+
+    const entry = {
+      id: Date.now(),
+      who: selectedWho,
+      sev: selectedSev,
+      cat: selectedCat,
+      desc,
+      tiltak,
+      dato: new Date().toLocaleDateString('no-NO', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' }),
+      behandlet: false
+    };
+
+    avvik.unshift(entry);
+    save();
+
+    // reset
+    document.querySelectorAll('.who-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.sev-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('desc-input').value = '';
+    document.getElementById('tiltak-input').value = '';
+    selectedWho = selectedSev = selectedCat = null;
+
+    const toast = document.getElementById('toast');
+    toast.style.display = 'block';
+    setTimeout(() => toast.style.display = 'none', 2500);
+  });
+
+  // ---- FILTER ----
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      renderList();
+    });
+  });
+
+  // ---- RENDER BEHANDLE ----
+  function renderBehandle() {
+    renderStats();
+    renderList();
+  }
+
+  function renderStats() {
+    const total = avvik.length;
+    const open = avvik.filter(a => !a.behandlet).length;
+    const done = avvik.filter(a => a.behandlet).length;
+
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-open').textContent = open;
+    document.getElementById('stat-done').textContent = done;
+
+    const mannInn = avvik.filter(a => a.who === 'Mann').length;
+    const koneInn = avvik.filter(a => a.who === 'Kone').length;
+    const mannMot = avvik.filter(a => a.who !== 'Mann').length;
+    const koneMot = avvik.filter(a => a.who !== 'Kone').length;
+    const mannKrise = avvik.filter(a => a.who === 'Mann' && a.sev === 3).length;
+    const koneKrise = avvik.filter(a => a.who === 'Kone' && a.sev === 3).length;
+
+    document.getElementById('mann-inn').textContent = mannInn;
+    document.getElementById('mann-mot').textContent = mannMot;
+    document.getElementById('mann-krise').textContent = mannKrise;
+    document.getElementById('kone-inn').textContent = koneInn;
+    document.getElementById('kone-mot').textContent = koneMot;
+    document.getElementById('kone-krise').textContent = koneKrise;
+
+    const mannPct = total > 0 ? Math.round((mannMot / total) * 100) : 0;
+    const konePct = total > 0 ? Math.round((koneMot / total) * 100) : 0;
+
+    document.getElementById('mann-bar').style.width = mannPct + '%';
+    document.getElementById('kone-bar').style.width = konePct + '%';
+    document.getElementById('mann-pct').textContent = 'Ansvarsandel: ' + mannPct + '%';
+    document.getElementById('kone-pct').textContent = 'Ansvarsandel: ' + konePct + '%';
+  }
+
+  function renderList() {
+    const list = document.getElementById('avvik-list');
+    let filtered = avvik;
+
+    if (currentFilter === 'åpne') filtered = avvik.filter(a => !a.behandlet);
+    else if (currentFilter === 'behandlet') filtered = avvik.filter(a => a.behandlet);
+    else if (currentFilter === 'Mann') filtered = avvik.filter(a => a.who === 'Mann');
+    else if (currentFilter === 'Kone') filtered = avvik.filter(a => a.who === 'Kone');
+
+    if (filtered.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🎉</div>
+          <p>Ingen avvik å vise. Enten er dere perfekte<br>— eller ingen har klaget enda.</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(a => `
+      <div class="avvik-item ${a.behandlet ? 'behandlet' : ''}" id="item-${a.id}">
+        <div class="sev-badge s${a.sev}">${a.sev}</div>
+        <div class="avvik-content">
+          <div class="avvik-header">
+            <span class="avvik-who ${a.who.toLowerCase()}">${a.who === 'Mann' ? '👨' : '👩'} ${a.who}</span>
+            <span class="avvik-cat">${a.cat}</span>
+            <span class="avvik-date">${a.dato}</span>
+          </div>
+          <div class="avvik-desc">${escHtml(a.desc)}${a.tiltak ? `<br><span style="font-size:12px;color:var(--ink-light)">Tiltak: ${escHtml(a.tiltak)}</span>` : ''}</div>
+          <div class="avvik-actions">
+            <button class="action-btn ok-btn" data-id="${a.id}">${a.behandlet ? '✓ Behandlet' : '✅ Marker behandlet'}</button>
+            <button class="action-btn del-btn" data-id="${a.id}">🗑️ Slett</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('.ok-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.dataset.id);
+        const item = avvik.find(a => a.id === id);
+        if (item) { item.behandlet = !item.behandlet; save(); renderBehandle(); }
+      });
+    });
+
+    list.querySelectorAll('.del-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.dataset.id);
+        if (confirm('Slette dette avviket fra journalen?')) {
+          avvik = avvik.filter(a => a.id !== id);
+          save();
+          renderBehandle();
+        }
+      });
+    });
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // Init stats if on behandle tab
+  renderStats();
+</script>
+</body>
+</html>
